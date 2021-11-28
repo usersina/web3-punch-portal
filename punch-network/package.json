@@ -1,12 +1,12 @@
 {
-  "name": "wave-contract",
+  "name": "punch-network",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx hardhat node",
     "test": "npx hardhat run scripts/run.js",
-    "deploy-localhost": "npx hardhat run scripts/deploy.js --network localhost"
+    "start": "npx hardhat node",
+    "deploy-to-localhost": "npx hardhat run scripts/deploy.js --network localhost"
   },
   "keywords": [],
   "author": "",
