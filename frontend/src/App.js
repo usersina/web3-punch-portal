@@ -6,20 +6,33 @@ import './App.css';
 const CONTRACT_ADDRESS = '0xaCEd4c3c1B03948B3cA57E4047a29F8f1491f746';
 
 export default function App() {
-  // https://rinkeby.etherscan.io/address/0xaCEd4c3c1B03948B3cA57E4047a29F8f1491f746
   const [currentAccount, setCurrentAccount] = useState('');
+  const [totalPunches, setTotalPunches] = useState(0);
+  const [punching, setPunching] = useState(false);
 
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
       if (!ethereum) {
-        return alert('Download MetamMsk!');
+        return alert('Download Metamask!');
       }
 
       const accounts = await ethereum.request({
         method: 'eth_requestAccounts',
       });
       console.log('Connected', accounts[0]);
+
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const punchPortalContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        abi,
+        signer
+      );
+
+      const count = await punchPortalContract.getTotalPunches();
+
+      setTotalPunches(count.toNumber());
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.log(error);
@@ -27,6 +40,7 @@ export default function App() {
   };
 
   const punch = async () => {
+    setPunching(true);
     try {
       const { ethereum } = window;
       if (!ethereum) {
@@ -41,9 +55,17 @@ export default function App() {
         signer
       );
 
-      let count = await punchPortalContract.getTotalPunches();
-      console.log('Number of punches so far:', count.toNumber());
+      // Execute the punch function from the smart contract
+      const punchTxn = await punchPortalContract.punch();
+      console.log('Mining...', punchTxn.hash);
+
+      await punchTxn.wait();
+      console.log('Mined -- ', punchTxn.hash);
+
+      setTotalPunches(totalPunches + 1);
+      setPunching(false);
     } catch (error) {
+      setPunching(false);
       console.log(error);
     }
   };
@@ -63,6 +85,18 @@ export default function App() {
 
       const account = accounts[0];
       console.log('Found an authorized account:', account);
+
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const punchPortalContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        abi,
+        signer
+      );
+
+      const count = await punchPortalContract.getTotalPunches();
+
+      setTotalPunches(count.toNumber());
       setCurrentAccount(account);
     };
     checkIfWalletIsConnected();
@@ -84,9 +118,18 @@ export default function App() {
         </div>
 
         {currentAccount ? (
-          <button className="waveButton" onClick={punch}>
-            Punch Me!
-          </button>
+          <>
+            <p className="bio">
+              Punches withstood so far: <strong>{totalPunches}</strong>
+            </p>
+            {punching ? (
+              <button className="waveButton">Getting punched...</button>
+            ) : (
+              <button className="waveButton" onClick={punch}>
+                Punch Me!
+              </button>
+            )}
+          </>
         ) : (
           <button className="waveButton" onClick={connectWallet}>
             Connect Wallet!
