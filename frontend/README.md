@@ -1,5 +1,10 @@
-# Punch Portal Web App
-This is a very basic React app that connects to your **Ethereum metamask wallet rinkeby network** and lets you view and add messages to the blockchain!
+# Simple React App
+The react app that allows you to add data to the blockchain. It uses a custom event listener on the contract itself to update the list in **realtime!**
 
-### **Note**
+<div align="center">
+
+![Web](../media/react-interface.JPG)
+</div>
+
+**Note:**
 Please do not follow the monolithic style of this app in production.

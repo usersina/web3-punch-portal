@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { abi } from './utils/PunchPortal.json';
 import './App.css';
 
-const CONTRACT_ADDRESS = '0x916513995E5E73D46dbc45AF4E97Ec7854297f00';
+const CONTRACT_ADDRESS = '0x29df7934A97348C103AFde28D98d383B9cB55C8F';
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState('');
@@ -93,15 +93,13 @@ export default function App() {
       );
 
       // Execute the punch function from the smart contract
-      const punchTxn = await punchPortalContract.punch(message);
+      const punchTxn = await punchPortalContract.punch(message, {
+        gasLimit: 300000,
+      });
       console.log('Mining...', punchTxn.hash);
 
       await punchTxn.wait();
       console.log('Mined -- ', punchTxn.hash);
-
-      // Setup an event listener to avoid hitting the blockchain for data
-      // https://github.com/usersina/react-mint-nft/blob/main/src/App.js#L54-L80
-      getAllPunches();
 
       setTotalPunches(totalPunches + 1);
       setPunching(false);
@@ -144,6 +142,37 @@ export default function App() {
     checkIfWalletIsConnected();
   }, []);
 
+  // Listen for event emitters
+  useEffect(() => {
+    let punchPortalContract;
+    const onNewPunch = (from, timestamp, message) => {
+      console.log('NewPunch', from, timestamp, message);
+      setAllPunches((prevState) => [
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message: message,
+        },
+        ...prevState,
+      ]);
+    };
+
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+
+      punchPortalContract = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
+      punchPortalContract.on('NewPunch', onNewPunch);
+    }
+
+    return () => {
+      if (punchPortalContract) {
+        punchPortalContract.off('NewPunch', onNewPunch);
+      }
+    };
+  }, []);
+
   return (
     <div className="mainContainer">
       <div className="dataContainer">
@@ -156,7 +185,8 @@ export default function App() {
 
         <div className="bio">
           I am the best fighter around and I'm not afraid of taking your best
-          punch! Connect your Ethereum wallet and punch me!
+          punch! Connect your Ethereum wallet and punch me! One punch every 5
+          minutes please!
         </div>
 
         {currentAccount ? (

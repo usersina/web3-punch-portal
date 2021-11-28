@@ -20,8 +20,9 @@ const main = async () => {
   let punchTxn = await punchContract.punch('Punch #1!');
   await punchTxn.wait();
 
-  punchTxn = await punchContract.punch('Punch #2!');
-  await punchTxn.wait();
+  // Will fail since you need to wait 5 minutes between each punch from the same address
+  // punchTxn = await punchContract.punch('Punch #2!');
+  // await punchTxn.wait();
 
   contractBalance = await hre.ethers.provider.getBalance(punchContract.address);
   console.log(
