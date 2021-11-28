@@ -5,8 +5,10 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract PunchPortal {
+    // Should be equal to the sum of all mappings
     uint256 totalPunches;
 
+    // Map earch address to its total number of punches
     mapping(address => uint256) punches;
 
     constructor() {
