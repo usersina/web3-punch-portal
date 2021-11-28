@@ -22,6 +22,9 @@ contract PunchPortal {
 
     Punch[] punches;
 
+    // Link address to the last time a user punched
+    mapping(address => uint256) lastPunchedAt;
+
     constructor() payable {
         console.log("Smart contract is constructed!");
 
@@ -30,6 +33,13 @@ contract PunchPortal {
     }
 
     function punch(string memory _message) public {
+        require(
+            lastPunchedAt[msg.sender] + 5 minutes < block.timestamp,
+            "Wait 5 minutes before punching again!"
+        );
+
+        lastPunchedAt[msg.sender] = block.timestamp;
+
         totalPunches += 1;
         console.log("%s has punched!", msg.sender);
 
