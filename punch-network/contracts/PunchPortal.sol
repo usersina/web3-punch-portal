@@ -8,21 +8,46 @@ contract PunchPortal {
     // Should be equal to the sum of all mappings
     uint256 totalPunches;
 
-    // Map earch address to its total number of punches
-    mapping(address => uint256) punches;
+    event NewPunch(address indexed from, uint256 timestamp, string message);
+
+    // Custom datatype
+    struct Punch {
+        address puncher; // The address of the user who punched.
+        string message; // The message the user sent.
+        uint256 timestamp; // The timestamp when the user punched.
+    }
+
+    Punch[] punches;
 
     constructor() {
         console.log("Smart contract is constructed!");
     }
 
-    function punch() public {
+    function punch(string memory _message) public {
         totalPunches += 1;
         console.log("%s has punched!", msg.sender);
-        punches[msg.sender] = punches[msg.sender] + 1;
+
+        // Store the punch in the punches array
+        punches.push(Punch(msg.sender, _message, block.timestamp));
+
+        // Emit an event to be catched in the frontend
+        emit NewPunch(msg.sender, block.timestamp, _message);
     }
 
-    function getPunchesByAddress(address owner) public view returns (uint256) {
-        return punches[owner];
+    function getAllPunches() public view returns (Punch[] memory) {
+        return punches;
+    }
+
+    function getPunchesNumberByAddress(address owner)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 punchesNumber = 0;
+        for (uint256 index = 0; index < punches.length; index++)
+            if (punches[index].puncher == owner) punchesNumber++;
+
+        return punchesNumber;
     }
 
     function getTotalPunches() public view returns (uint256) {

@@ -13,27 +13,34 @@ const main = async () => {
 
   // Random person punches 5 times
   for (let i = 0; i < 5; i++) {
-    const punchTxn = await punchContract.connect(randomPerson).punch();
+    const punchTxn = await punchContract
+      .connect(randomPerson)
+      .punch('A random message!');
     await punchTxn.wait();
   }
 
   // Owner punches 8 times
   for (let i = 0; i < 8; i++) {
-    const punchTxn = await punchContract.punch();
+    const punchTxn = await punchContract.punch('Another random message!');
     await punchTxn.wait();
   }
 
   console.log('Owner address:', owner.address);
-  const ownerPunches = await punchContract.getPunchesByAddress(owner.address);
-  console.log('Owner punches:', ownerPunches);
+  const ownerPunches = await punchContract.getPunchesNumberByAddress(
+    owner.address
+  );
+  console.log('Owner punches:', ownerPunches.toNumber());
 
   console.log('Stranger address:', randomPerson.address);
-  const strangerPunches = await punchContract.getPunchesByAddress(
+  const strangerPunches = await punchContract.getPunchesNumberByAddress(
     randomPerson.address
   );
-  console.log('Stranger punches:', strangerPunches);
+  console.log('Stranger punches:', strangerPunches.toNumber());
 
   punchCount = await punchContract.getTotalPunches();
+
+  const allPunches = await punchContract.getAllPunches();
+  console.log(allPunches);
 };
 
 (async () => {
