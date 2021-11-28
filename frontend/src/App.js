@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { abi } from './utils/PunchPortal.json';
 import './App.css';
 
-const CONTRACT_ADDRESS = '0x71b275aafaF9A83DD713086B9FC48D604E036f8a';
+const CONTRACT_ADDRESS = '0x916513995E5E73D46dbc45AF4E97Ec7854297f00';
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState('');
