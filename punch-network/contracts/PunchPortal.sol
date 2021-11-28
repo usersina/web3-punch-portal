@@ -5,6 +5,9 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract PunchPortal {
+    // Used to generate a "random" number
+    uint256 private seed;
+
     // Should be equal to the sum of all mappings
     uint256 totalPunches;
 
@@ -21,6 +24,9 @@ contract PunchPortal {
 
     constructor() payable {
         console.log("Smart contract is constructed!");
+
+        // Generate the first contract seed value
+        seed = (block.timestamp + block.difficulty) % 100;
     }
 
     function punch(string memory _message) public {
@@ -33,14 +39,21 @@ contract PunchPortal {
         // Emit an event to be catched in the frontend
         emit NewPunch(msg.sender, block.timestamp, _message);
 
-        uint256 prizeAmount = 0.0001 ether;
-        require(
-            prizeAmount <= address(this).balance,
-            "Trying to withdraw more money that the contract has!"
-        );
+        // Generate a new seed for the next user
+        seed = (block.difficulty + block.timestamp + seed) % 100;
 
-        (bool success, ) = (msg.sender).call{value: prizeAmount}("");
-        require(success, "Failed to withdraw money from contract!");
+        console.log("Generated seed: %s", seed);
+        if (seed <= 50) {
+            // 50% change to get 0.0001 ether as a reward
+            uint256 prizeAmount = 0.0001 ether;
+            require(
+                prizeAmount <= address(this).balance,
+                "Trying to withdraw more money that the contract has!"
+            );
+
+            (bool success, ) = (msg.sender).call{value: prizeAmount}("");
+            require(success, "Failed to withdraw money from contract!");
+        }
     }
 
     function getAllPunches() public view returns (Punch[] memory) {

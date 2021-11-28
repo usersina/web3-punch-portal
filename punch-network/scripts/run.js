@@ -17,7 +17,10 @@ const main = async () => {
   );
 
   // Send a punch
-  const punchTxn = await punchContract.punch('A message!');
+  let punchTxn = await punchContract.punch('Punch #1!');
+  await punchTxn.wait();
+
+  punchTxn = await punchContract.punch('Punch #2!');
   await punchTxn.wait();
 
   contractBalance = await hre.ethers.provider.getBalance(punchContract.address);
