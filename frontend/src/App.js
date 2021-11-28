@@ -99,7 +99,10 @@ export default function App() {
       await punchTxn.wait();
       console.log('Mined -- ', punchTxn.hash);
 
+      // Setup an event listener to avoid hitting the blockchain for data
+      // https://github.com/usersina/react-mint-nft/blob/main/src/App.js#L54-L80
       getAllPunches();
+
       setTotalPunches(totalPunches + 1);
       setPunching(false);
     } catch (error) {
