@@ -53,7 +53,7 @@ contract PunchPortal {
         seed = (block.difficulty + block.timestamp + seed) % 100;
 
         console.log("Generated seed: %s", seed);
-        if (seed <= 50) {
+        if (seed <= 40) {
             // 50% change to get 0.0001 ether as a reward
             uint256 prizeAmount = 0.0001 ether;
             require(
